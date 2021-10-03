@@ -1,0 +1,200 @@
+{
+    //----------------------------------------
+    // GENERAL
+    //----------------------------------------
+    "Commentaire": {
+        "scope": "javascript,typescript",
+        "prefix": "com",
+        "body": [
+            "//----------------------------------------",
+            "// $1",
+            "//----------------------------------------"
+        ],
+        "description": "Commentaire"
+    },
+    "dao": {
+        "scope": "javascript,typescript",
+        "prefix": "dao",
+        "body": [
+            "const $3 $1 = new $1(${2|req.loggedUser.permissions.,'system'|});$4",
+        ],
+        "description": "Fonction renvoyée a un rouute"
+    },
+    "fne": {
+        "prefix": "fne",
+        "description": "Function exports",
+        "body": [
+            "exports.$1 = $2 => {",
+            "    $3",
+            "};"
+        ]
+    },
+    "dataValid": {
+        "prefix": "datavalid",
+        "description": "require data validation utils",
+        "body": [
+            "const {$1} = require('@cawita/data-validation-utils');"
+        ]
+    },
+    //----------------------------------------
+    // API
+    //----------------------------------------
+    "routefn": {
+        "scope": "javascript,typescript",
+        "prefix": "routefn",
+        "body": [
+            "return async (req, res, next) => {",
+            "    try {",
+            "        $1",
+            "    } catch (e) {",
+            "        next(e);",
+            "    }",
+            "};"
+        ],
+        "description": "Fonction renvoyée a un route Express"
+    },
+    "middleware": {
+        "prefix": [
+            "mwfn",
+            "middlewareFn"
+        ],
+        "body": [
+            "${1:name}() {",
+            "    return this.fn(async (req, ctx) => {",
+            "        $2",
+            "    });",
+            "}"
+        ]
+    },
+    "reqValidator": {
+        "prefix": "reqValidator",
+        "body": [
+            "{ name: '$1', $2},",
+            "$3"
+        ],
+        "description": "reqBodyValidator or reqQueryValidator"
+    },
+    "mustNotBeSet": {
+        "prefix": "mustNotBeSet",
+        "body": [
+            "{ name: '$1', mustNotBeSet:true},",
+            "$2"
+        ],
+        "description": "reqBodyValidator or reqQueryValidator"
+    },
+    //----------------------------------------
+    // ERRORS
+    //----------------------------------------
+    "appError": {
+        "scope": "javascript,typescript",
+        "prefix": "apperr",
+        "body": [
+            "throw new ApplicationError($2,$1);",
+        ],
+        "description": "Fonction renvoyée a un rouute"
+    },
+    "404": {
+        "prefix": [
+            "e404",
+            "err404"
+        ],
+        "body": [
+            "if(!isset($1)) throw new ApplicationError('$1DoNotExist',404);",
+            "$2"
+        ]
+    },
+    //----------------------------------------
+    // CONSOLE
+    //----------------------------------------
+    "Print var to console": {
+        "prefix": "csl",
+        "body": [
+            "console.log(`$1`, $1 );"
+        ],
+        "description": "Print a var to console"
+    },
+    "Print info to console": {
+        "prefix": "csi",
+        "body": [
+            "console.log(`$1`, $2 );"
+        ],
+        "description": "Print info var to console"
+    },
+    "Console.error": {
+        "prefix": "cse",
+        "body": [
+            "console.error(`$1`, $2);"
+        ],
+        "description": "Log ERROR to console"
+    },
+    "Console.time": {
+        "prefix": "cst",
+        "body": [
+            "console.time('$1');"
+        ],
+        "description": "Log time to console: usefull for performance testing"
+    },
+    "Console.timeEnd": {
+        "prefix": "cste",
+        "body": [
+            "console.timeEnd('$1');"
+        ],
+        "description": "Log timeEnd to console"
+    },
+    //----------------------------------------
+    // TESTS
+    //----------------------------------------
+    "test": {
+        "prefix": "test",
+        "body": [
+            "test({ name: `$1`, value: $1, ${2:eq}: $3 });"
+        ],
+        "description": "test"
+    },
+    "testType": {
+        "prefix": "test:type",
+        "body": [
+            "test({ name: `$1`, value: $1, ${2:type}: $3 });"
+        ],
+        "description": "test that is type ['array', 'objectId', 'object', 'dateInt12', 'dateInt8', 'time', 'number', 'boolean']"
+    },
+    "testMustNotBeSet": {
+        "prefix": "test:mustNotBeSet",
+        "body": [
+            "test({ name: `$1`, value: $1, mustNotBeSet: true });"
+        ],
+        "description": "test that mustNotBeSet"
+    },
+    "testFalse": {
+        "prefix": [
+            "testFalse",
+            "stopTheTrain"
+        ],
+        "body": [
+            "test({ name: 'Stop the train', value: true, eq: false });"
+        ],
+        "description": "Stop the train"
+    },
+    //----------------------------------------
+    // MODELS
+    //----------------------------------------
+    "model.translate": {
+        "prefix": "model.translationString",
+        "description": "",
+        "body": [
+            "$1 : { fr:String, en:String, de:String, es:String, it:String,},",
+            "$2",
+        ]
+    },
+    "model.type.ObjectId": {
+        "prefix": [
+            "model.type.ObjectId",
+            "model.type.ref"
+        ],
+        "description": "model.type.ObjectId",
+        "body": [
+            "$1 : { type: ObjectId, ref: '$1' },",
+            "$2",
+        ]
+    },
+}
