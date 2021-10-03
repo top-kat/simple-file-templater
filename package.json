@@ -4,23 +4,21 @@
     "description": "Simple templating system for file. Pattern replacer, file name replacer...",
     "main": "templater.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "bump:major": "node node_modules/@cawita/bump-simple/bump-simple.js --major",
-        "bump:minor": "node node_modules/@cawita/bump-simple/bump-simple.js --minor",
-        "bump:patch": "node node_modules/@cawita/bump-simple/bump-simple.js --patch"
+        "bump:major": "node node_modules/bump-simple/bump-simple.js --major",
+        "bump:minor": "node node_modules/bump-simple/bump-simple.js --minor",
+        "bump:patch": "node node_modules/bump-simple/bump-simple.js --patch"
     },
     "author": "538ROMEO",
     "license": "ISC",
     "repository": {
         "type": "git",
-        "url": "git+https://gitlab.com/cawita-technologies/modules/templater.git"
+        "url": "git+https://github.com/top-kat/simple-file-templater.git"
     },
     "bugs": {
-        "url": "https://gitlab.com/cawita-technologies/modules/templater/issues"
+        "url": "https://github.com/top-kat/simple-file-templater/issues"
     },
-    "homepage": "https://gitlab.com/cawita-technologies/modules/templater#readme",
+    "homepage": "https://github.com/top-kat/simple-file-templater",
     "dependencies": {
-        "topkat-utils": "^1.0.64",
         "fast-glob": "^3.0.4",
         "fs-extra": "^8.1.0"
     },
