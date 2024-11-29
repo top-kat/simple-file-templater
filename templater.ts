@@ -14,7 +14,7 @@ export function templater(
      * * OR [[/myRegExp/g, 'myString'], ['myString1', 'myString2']...]
      * * DON'T forget the g flag when using regexps 
     */
-    replaceInFiles = [],
+    replaceInFiles: { [variable: string]: string } | [string: string | RegExp, replacement: string][] = [],
     /** same as above but for fileNames (only valid when copying folders) */
     replaceInFileNames = [],
     /** regexp array to check against path. Eg: /node_module/ <= file paths that includes the word node_module will not be taken in account */
@@ -24,8 +24,8 @@ export function templater(
         err500IfNotSet({ from, to, varz: replaceInFiles })
 
         // convert all replacement data to array [ [regExpToReplace, replacer], ... ]
-        if (isObject(replaceInFiles)) replaceInFiles = Object.entries(replaceInFiles);
-        replaceInFiles.forEach(([toReplace, replacer], i, arr) => toReplace instanceof RegExp || (arr[i] = [new RegExp(toReplace, 'g'), replacer]));
+        const replaceInFilesArr = Array.isArray(replaceInFiles) ? replaceInFiles : Object.entries(replaceInFiles)
+        replaceInFilesArr.forEach(([toReplace, replacer], i, arr) => toReplace instanceof RegExp || (arr[i] = [new RegExp(toReplace, 'g'), replacer]));
         if (isObject(replaceInFileNames)) replaceInFileNames = Object.entries(replaceInFileNames);
         replaceInFileNames.forEach(([toReplace, replacer], i, arr) => toReplace instanceof RegExp || (arr[i] = [new RegExp(toReplace, 'g'), replacer]));
 
