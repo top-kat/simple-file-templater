@@ -2,8 +2,9 @@
     "name": "simple-file-templater",
     "version": "1.0.2",
     "description": "Simple templating system for file. Pattern replacer, file name replacer...",
-    "main": "templater.js",
+    "main": "./dist/templater.js",
     "scripts": {
+        "build": "tsc",
         "bump:major": "node node_modules/bump-simple/bump-simple.js --major",
         "bump:minor": "node node_modules/bump-simple/bump-simple.js --minor",
         "bump:patch": "node node_modules/bump-simple/bump-simple.js --patch"
@@ -25,5 +26,14 @@
     "devDependencies": {
         "@types/node": "^22.10.1",
         "bump-simple": "^1.0.0"
-    }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "files": [
+        "*.ts",
+        "model-types/*.ts",
+        "constants/*.ts",
+        "*"
+    ]
 }
