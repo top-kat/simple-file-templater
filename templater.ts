@@ -1,25 +1,25 @@
-const fs = require('fs-extra');
-const path = require('path');
-const fg = require('fast-glob');
+import fs from 'fs-extra'
+import path from 'path'
+import fg from 'fast-glob'
 
-module.exports = {
-    templater,
-    injector,
-    fileToLines,
-};
 
-/**
- * @param {String} from absolute url of template (it can be a folder)
- * @param {String} to absolute url of folder/file to be copied (it can be a folder)
- * @param {Object|Array} replaceInFiles list of variables to interpolates
- * * {myVar : myReplacement}
- * * OR [[/myRegExp/g, 'myString'], ['myString1', 'myString2']...]
- * * DON'T forget the g flag when using regexps
- * @param {Object|Array} replaceInFileNames same as above but for fileNames (only valid when copying folders)
- * @param {RegExp[]} ignorePaths regexp array to check against path. Eg: /node_module/ <= file paths that includes the word node_module will not be taken in account
- * @return {Array} createdPaths
- */
-function templater(from, to, replaceInFiles = [], replaceInFileNames = [], ignorePaths = []) {
+/** Get the content of a folder and move it with option to replace in files or in fileNames as you go */
+export function templater(
+    /** absolute url of template (it can be a folder) */
+    from: string,
+    /** absolute url of folder/file to be copied (it can be a folder) */
+    to: string,
+    /** list of variables to interpolates
+     * * {myVar : myReplacement}
+     * * OR [[/myRegExp/g, 'myString'], ['myString1', 'myString2']...]
+     * * DON'T forget the g flag when using regexps 
+    */
+    replaceInFiles = [],
+    /** same as above but for fileNames (only valid when copying folders) */
+    replaceInFileNames = [],
+    /** regexp array to check against path. Eg: /node_module/ <= file paths that includes the word node_module will not be taken in account */
+    ignorePaths = []
+) {
     try {
         err500IfNotSet({ from, to, varz: replaceInFiles })
 
@@ -29,8 +29,9 @@ function templater(from, to, replaceInFiles = [], replaceInFileNames = [], ignor
         if (isObject(replaceInFileNames)) replaceInFileNames = Object.entries(replaceInFileNames);
         replaceInFileNames.forEach(([toReplace, replacer], i, arr) => toReplace instanceof RegExp || (arr[i] = [new RegExp(toReplace, 'g'), replacer]));
 
-        const createdPath = [];
-        let files = [from];
+        const createdPath = [] as string[]
+
+        let files = [from]
         const templateIsDirectory = fs.statSync(from).isDirectory();
         // get directory structure
         if (templateIsDirectory) {
@@ -55,17 +56,20 @@ function templater(from, to, replaceInFiles = [], replaceInFileNames = [], ignor
             createdPath.push(newFileFullPath);
         }
 
-        return createdPath;
+        return createdPath
     } catch (err) { console.error(err); }
 }
 
-/** Inject content into a file at specified place
- * @param {String} filePath url of the file where the content will be injected
- * @param {String} data
- * @param {Number|RegExp|String} after Number == lineNumber || RegExp == will replace the first matching group || String == will place content after the string
- * NOTE: don't forget **the g flag** for regexp if you want to match all occurences
- */
-function injector(filePath, data, after) {
+/** Inject content into a file at specified place */
+export function injector(
+    /** url of the file where the content will be injected */
+    filePath: string,
+    data: string,
+    /** Number == lineNumber || RegExp == will replace the first matching group || String == will place content after the string
+     * NOTE: don't forget **the g flag** for regexp if you want to match all occurences
+     */
+    after: number | string | RegExp
+) {
     try {
         err500IfNotSet({ filePath, data, after });
         if (!fs.existsSync(filePath)) throw 'file for injection do not exist';
@@ -89,13 +93,17 @@ function injector(filePath, data, after) {
     } catch (err) { console.error(err); }
 }
 
-/** Turns a file content into a list of lines
- * @param {String} filePath absolute path of file
- * @param {RegExp} regexp get only lines from the first matching group
- * @param {Boolean} ignoreInlineComments still count as a line;  avoid conflicting with regexp, for ex if regexp match all inside \(.*\), and a comment with "// 1] blah" is found is in the middle
- * @return {array[]} [ [2, 'lineContentString' ], [3, 'line2']... ]   lineNumber, content
- */
-function fileToLines(filePath, regexp, ignoreInlineComments = true, trim = true) {
+/** Turns a file content into a list of lines */
+export function fileToLines(
+    /** absolute path of file */
+    filePath: string,
+    /** get only lines from the first matching group */
+    regexp,
+    /** still count as a line;  avoid conflicting with regexp, for ex if regexp match all inside \(.*\), and a comment with "// 1] blah" is found is in the middle */
+    ignoreInlineComments = true,
+    /** Will trime each line */
+    trim = true
+): [lineNumber: number, content: string][] {
     try {
         err500IfNotSet({ filePath });
         if (!fs.existsSync(filePath)) throw 'file for injection do not exist';
