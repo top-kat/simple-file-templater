@@ -21,7 +21,8 @@
     "homepage": "https://github.com/top-kat/simple-file-templater",
     "dependencies": {
         "fast-glob": "^3.0.4",
-        "fs-extra": "^8.1.0"
+        "fs-extra": "^8.1.0",
+        "topkat-utils": "^1.2.106"
     },
     "devDependencies": {
         "@types/node": "^22.10.1",

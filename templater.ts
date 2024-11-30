@@ -1,7 +1,10 @@
+
+
 import fs from 'fs-extra'
 import path from 'path'
 import fg from 'fast-glob'
 
+import { isset, err500IfNotSet, escapeRegexp } from 'topkat-utils'
 
 /** Get the content of a folder and move it with option to replace in files or in fileNames as you go */
 export function templater(
@@ -14,46 +17,44 @@ export function templater(
      * * OR [[/myRegExp/g, 'myString'], ['myString1', 'myString2']...]
      * * DON'T forget the g flag when using regexps 
     */
-    replaceInFiles: { [variable: string]: string } | [string: string | RegExp, replacement: string][] = [],
+    replaceInFiles: [string: string | RegExp, replacement: string][] = [],
     /** same as above but for fileNames (only valid when copying folders) */
-    replaceInFileNames = [],
+    replaceInFileNames: [string: string | RegExp, replacement: string][] = [],
     /** regexp array to check against path. Eg: /node_module/ <= file paths that includes the word node_module will not be taken in account */
     ignorePaths = []
 ) {
     try {
         err500IfNotSet({ from, to, varz: replaceInFiles })
 
-        // convert all replacement data to array [ [regExpToReplace, replacer], ... ]
-        const replaceInFilesArr = Array.isArray(replaceInFiles) ? replaceInFiles : Object.entries(replaceInFiles)
-        replaceInFilesArr.forEach(([toReplace, replacer], i, arr) => toReplace instanceof RegExp || (arr[i] = [new RegExp(toReplace, 'g'), replacer]));
-        if (isObject(replaceInFileNames)) replaceInFileNames = Object.entries(replaceInFileNames);
-        replaceInFileNames.forEach(([toReplace, replacer], i, arr) => toReplace instanceof RegExp || (arr[i] = [new RegExp(toReplace, 'g'), replacer]));
+        const replaceInFilesParsed = parseRegexpArray(replaceInFiles)
+        const replaceInFileNameArr = parseRegexpArray(replaceInFileNames)
 
         const createdPath = [] as string[]
 
         let files = [from]
-        const templateIsDirectory = fs.statSync(from).isDirectory();
+        const templateIsDirectory = fs.statSync(from).isDirectory()
+
         // get directory structure
         if (templateIsDirectory) {
-            if (fs.existsSync(to) && !fs.statSync(to).isDirectory()) throw '"from" argument is a directory but "to" arg is a file';
-            files = fg.sync(`${from}/**/*`, { dot: true });
-        } else if (fs.existsSync(to) && fs.statSync(to).isDirectory()) throw '"to" argument is a directory but "from" arg is a file';
+            if (fs.existsSync(to) && !fs.statSync(to).isDirectory()) throw '"from" argument is a directory but "to" arg is a file'
+            files = fg.sync(`${from}/**/*`, { dot: true })
+        } else if (fs.existsSync(to) && fs.statSync(to).isDirectory()) throw '"to" argument is a directory but "from" arg is a file'
 
         for (const fileFullPath of files) {
-            if (ignorePaths.some(reg => reg.test(fileFullPath))) continue;
-            let newFileFullPath = to;
+            if (ignorePaths.some(reg => reg.test(fileFullPath))) continue
+            let newFileFullPath = to
             if (templateIsDirectory) {
-                const [, filePath, fileName] = fileFullPath.match(/(.*)\/(.*)$/) || [];
+                const [, filePath, fileName] = fileFullPath.match(/(.*)\/(.*)$/) || []
                 const newFilePath = filePath.replace(from, to);
-                const newFileName = replaceInFileNames.reduce((str, [toReplace, replacer]) => str.replace(toReplace, replacer), fileName);
-                newFileFullPath = path.join(newFilePath, newFileName);
+                const newFileName = replaceInFileNameArr.reduce((str, [toReplace, replacer]) => str.replace(toReplace, replacer), fileName)
+                newFileFullPath = path.join(newFilePath, newFileName)
             }
-            const oldFileContent = fs.readFileSync(fileFullPath, 'utf-8');
-            const newFileContent = replaceInFiles.reduce((str, [toReplace, replacer]) => str.replace(toReplace, replacer), oldFileContent);
+            const oldFileContent = fs.readFileSync(fileFullPath, 'utf-8')
+            const newFileContent = replaceInFilesParsed.reduce((str, [toReplace, replacer]) => str.replace(toReplace, replacer), oldFileContent)
 
-            fs.outputFileSync(newFileFullPath, newFileContent);
+            fs.outputFileSync(newFileFullPath, newFileContent)
 
-            createdPath.push(newFileFullPath);
+            createdPath.push(newFileFullPath)
         }
 
         return createdPath
@@ -131,13 +132,10 @@ export function fileToLines(
 }
 
 
-function isset(...elms) {
-    return elms.every(elm => typeof elm !== 'undefined' && elm !== null);
-}
-function isObject(obj) { return isset(obj) && typeof obj === 'object' && Object.getPrototypeOf(obj) === Object.prototype; }
+//  ╦  ╦ ╔══╗ ╦    ╔══╗ ╔══╗ ╔══╗ ╔═══
+//  ╠══╣ ╠═   ║    ╠══╝ ╠═   ╠═╦╝ ╚══╗
+//  ╩  ╩ ╚══╝ ╚══╝ ╩    ╚══╝ ╩ ╚  ═══╝
 
-function err500IfNotSet(objectWithVarDescription) {
-    Object.entries(objectWithVarDescription).forEach(([name, value], i) => {
-        if (!isset(value)) throw new Error(`Param number ${i} (${name}) is not set in templater function.`)
-    })
+function parseRegexpArray(arr: [string | RegExp, string][]) {
+    return arr.map((conf) => typeof conf[0] === 'string' ? [new RegExp(escapeRegexp(conf[0])), conf[1]] as const : conf as [RegExp, string])
 }
