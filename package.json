@@ -9,7 +9,7 @@
         "bump:minor": "node node_modules/bump-simple/bump-simple.js --minor",
         "bump:patch": "node node_modules/bump-simple/bump-simple.js --patch"
     },
-    "author": "538ROMEO",
+    "author": "@topkat",
     "license": "ISC",
     "repository": {
         "type": "git",
@@ -26,7 +26,7 @@
     },
     "devDependencies": {
         "@types/node": "^22.10.1",
-        "bump-simple": "^1.0.0"
+        "bump-simple": "^1.0.27"
     },
     "publishConfig": {
         "access": "public"
