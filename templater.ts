@@ -137,5 +137,5 @@ export function fileToLines(
 //  ╩  ╩ ╚══╝ ╚══╝ ╩    ╚══╝ ╩ ╚  ═══╝
 
 function parseRegexpArray(arr: [string | RegExp, string][]) {
-    return arr.map((conf) => typeof conf[0] === 'string' ? [new RegExp(escapeRegexp(conf[0])), conf[1]] as const : conf as [RegExp, string])
+    return arr.map((conf) => typeof conf[0] === 'string' ? [new RegExp(escapeRegexp(conf[0]), 'g'), conf[1]] as const : conf as [RegExp, string])
 }
